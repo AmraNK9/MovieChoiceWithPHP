@@ -45,7 +45,7 @@ $id = $_GET['id']
                                     foreach ($image as $result) {
                                         echo $result;
                                     }
-                                } ?>" class="card-img-top" style = "height: 300px;object-fit:cover" alt="...">
+                                } ?>" class="card-img-top" style = "height:500px;object-fit:cover" alt="...">
                                 <div class="card-body">
                                     <h5 class="card-title">
                                         <?php foreach ($movie_title as $title) {

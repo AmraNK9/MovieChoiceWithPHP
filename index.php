@@ -1,5 +1,44 @@
 <?php
+    require("connect.php");
+    $limit = 2;
 
+session_start();
+if (isset($_SESSION['index'])) {
+    
+    $querry_for_row_count = "SELECT * FROM `collections`";
+    $number_of_row = mysqli_query($db,$querry_for_row_count);
+    $last_index = mysqli_num_rows($number_of_row)/$limit-1;
+
+    
+    if (isset($_GET['load'])) {
+        if ($_GET['load'] == "Next") {
+            if($_SESSION['index'] !== $last_index){
+            $_SESSION['index'] = $_SESSION['index'] + 1;
+            }
+        } 
+        else if ($_GET['load'] == "Prev") {
+            if($_SESSION['index'] !== 0){
+                $_SESSION['index'] = $_SESSION['index'] - 1;
+            }
+        }
+        else if($_GET['load'] == "End"){
+
+           
+           $_SESSION["index"] = $last_index;
+
+        }
+        else if($_GET['load'] == "Home"){
+            $_SESSION['index'] = 0;
+        }
+      
+    }
+
+} 
+else {
+    $_SESSION['index'] = 0;
+}
+
+$index = $limit * $_SESSION['index'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,31 +58,34 @@
 
 
 <body>
-    <nav class="navbar p-0 navbar-expand-lg navbar-light bg-light">
-        <div style="background-color: #212529" class="container-fluid">
-            <a class="navbar-brand text-white" href="#">My Website</a>
-           
-       
+    <nav class="navbar  bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand " href = 'index.php'>Movie Choice</a>
+            <form class="d-flex" action="searching.php" method="get" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" name="search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
         </div>
     </nav>
-    <div class="container  row">
-   
-            <ul class="text-white btn-group float-end" style = "list-style:none">
-                <li><a class="btn btn-primary" href="index.php?order=ASC">See latest</a></li>
-                <li><a class=" ms-1 btn btn-primary" href="index.php?order=DESC">See oldest</a></li>
+    <div class=" mt-2  row me-3">
+        <div class="float-end me-3">
+            <ul class="text-white btn-group float-end" style="list-style:none">
+                <li><a class="btn btn-warning" href="index.php?order=ASC">See latest</a></li>
+                <li><a class=" ms-1 btn btn-warning" href="index.php?order=DESC">See oldest</a></li>
             </ul>
-        
+        </div>
+
+
 
     </div>
 
     <?php
-    require("connect.php");
     if (isset($_GET['order'])) {
         $order = $_GET['order'];
     } else {
         $order = "ASC";
     }
-    $querry = "SELECT * FROM `collections` ORDER BY `title` $order";
+    $querry = "SELECT * FROM `collections` ORDER BY `title` $order Limit $limit offset $index";
     $result = mysqli_query($db, $querry);
     if (mysqli_num_rows($result) > 0) {
         foreach ($result as $row) {
@@ -126,10 +168,24 @@
         <?php }
     }
     ?>
+    <div class="container d-flex justify-content-center mt-2 mx-auto">
+
+        <nav aria-label="Page navigation text-center example mt-2 d-flex justify-content-center">
+            <ul class="pagination ">
+                <li class="page-item"><a class="page-link" href="index.php?load=Prev">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="index.php?load=Home">Home</a></li>
+                <li class="page-item"><a class="page-link" href="index.php?load=End">End</a></li>
+                <li class="page-item"><a class="page-link" href="index.php?load=Next">Next</a></li>
+            </ul>
+        </nav>
+    </div> 
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
